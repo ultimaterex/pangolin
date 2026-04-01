@@ -111,8 +111,3 @@ jobs:
                       CREATED=${{ steps.timestamp.outputs.iso }}
                       IMAGE_TITLE=Pangolin
                       IMAGE_DESCRIPTION=Identity-aware VPN and proxy for remote access to anything, anywhere
-</think>
-
-
-<｜tool▁calls▁begin｜><｜tool▁call▁begin｜>
-Read
