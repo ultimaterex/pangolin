@@ -103,11 +103,6 @@ export class PrivateConfig {
         process.env.SIGNUP_PAGE_SUBTITLE_TEXT =
             this.rawPrivateConfig.branding?.signup_page?.subtitle_text || "";
 
-        process.env.RESOURCE_AUTH_PAGE_HIDE_POWERED_BY =
-            this.rawPrivateConfig.branding?.resource_auth_page
-                ?.hide_powered_by === true
-                ? "true"
-                : "false";
         process.env.RESOURCE_AUTH_PAGE_SHOW_LOGO =
             this.rawPrivateConfig.branding?.resource_auth_page?.show_logo ===
             true
@@ -123,6 +118,25 @@ export class PrivateConfig {
         if (this.rawPrivateConfig.branding?.background_image_path) {
             process.env.BACKGROUND_IMAGE_PATH =
                 this.rawPrivateConfig.branding?.background_image_path;
+        }
+
+        if (this.rawPrivateConfig.branding?.site_url) {
+            process.env.BRANDING_SITE_URL =
+                this.rawPrivateConfig.branding.site_url;
+        }
+        if (this.rawPrivateConfig.branding?.auth_footer_publisher !== undefined) {
+            process.env.BRANDING_AUTH_FOOTER_PUBLISHER =
+                this.rawPrivateConfig.branding.auth_footer_publisher;
+        }
+        if (this.rawPrivateConfig.branding?.auth_footer_edition !== undefined) {
+            process.env.BRANDING_AUTH_FOOTER_EDITION =
+                this.rawPrivateConfig.branding.auth_footer_edition;
+        }
+        if (this.rawPrivateConfig.branding?.hide_auth_footer_publisher === true) {
+            process.env.BRANDING_AUTH_FOOTER_HIDE_PUBLISHER = "true";
+        }
+        if (this.rawPrivateConfig.branding?.hide_auth_footer_edition === true) {
+            process.env.BRANDING_AUTH_FOOTER_HIDE_EDITION = "true";
         }
 
         if (this.rawPrivateConfig.server.reo_client_id) {

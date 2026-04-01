@@ -1,0 +1,118 @@
+# Community (OSS) build — Node artifact upload + Docker image to GHCR (GitHub Container Registry).
+
+name: OSS build
+
+permissions:
+    contents: read
+    packages: write
+
+on:
+    push:
+        branches:
+            - main
+            - dev
+    pull_request:
+        branches:
+            - main
+            - dev
+    workflow_dispatch:
+
+concurrency:
+    group: oss-build-${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    build-oss:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+            - name: Install Node
+              uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+              with:
+                  node-version: "24"
+                  cache: npm
+
+            - name: Copy example config
+              run: cp config/config.example.yml config/config.yml
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: SQLite + OSS build targets
+              run: |
+                  npm run set:sqlite
+                  npm run set:oss
+
+            - name: Generate DB client (drizzle)
+              run: npm run db:generate
+
+            - name: Build (Next + server bundles)
+              run: npm run build
+
+            - name: Remove Next cache from artifact
+              run: rm -rf .next/cache
+
+            - name: Upload OSS build artifact
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              with:
+                  name: pangolin-oss-${{ github.sha }}
+                  path: |
+                      dist/
+                      .next/
+                  retention-days: 30
+
+    # Pushes to ghcr.io/<owner>/<repo> — same Dockerfile as local `make dev-build-sqlite`.
+    # Pull requests: build only (no push). Pushes to main/dev + workflow_dispatch: build and push.
+    docker-oss:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+
+            - name: Docker metadata
+              id: meta
+              uses: docker/metadata-action@318602eec993e4e6cc7e7205e781e2d4760e893c # v5.9.0
+              with:
+                  images: ghcr.io/${{ github.repository }}
+                  tags: |
+                      type=sha,prefix=sha-
+                      type=ref,event=branch
+                      type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+            - name: Set OCI created timestamp
+              id: timestamp
+              run: echo "iso=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+
+            - name: Log in to GitHub Container Registry
+              if: github.event_name != 'pull_request'
+              uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c58d # v3.6.0
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Build and push image
+              uses: docker/build-push-action@1dc73863535b631f894b8d905b7a216e6cb7655e # v6.18.0
+              with:
+                  context: .
+                  push: ${{ github.event_name != 'pull_request' }}
+                  tags: ${{ steps.meta.outputs.tags }}
+                  labels: ${{ steps.meta.outputs.labels }}
+                  build-args: |
+                      BUILD=oss
+                      DATABASE=sqlite
+                      VERSION=${{ github.sha }}
+                      REVISION=${{ github.sha }}
+                      CREATED=${{ steps.timestamp.outputs.iso }}
+                      IMAGE_TITLE=Pangolin
+                      IMAGE_DESCRIPTION=Identity-aware VPN and proxy for remote access to anything, anywhere
+</think>
+
+
+<｜tool▁calls▁begin｜><｜tool▁call▁begin｜>
+Read

@@ -41,7 +41,6 @@ import {
 } from "@app/actions/server";
 import { useEnvContext } from "@app/hooks/useEnvContext";
 import { toast } from "@app/hooks/useToast";
-import Link from "next/link";
 import BrandingLogo from "@app/components/BrandingLogo";
 import { useSupporterStatusContext } from "@app/hooks/useSupporterStatusContext";
 import { useTranslations } from "next-intl";
@@ -374,37 +373,6 @@ export default function ResourceAuthPortal(props: ResourceAuthPortalProps) {
         >
             {!accessDenied ? (
                 <div>
-                    {isUnlocked() && build === "enterprise" ? (
-                        !env.branding.resourceAuthPage?.hidePoweredBy && (
-                            <div className="text-center mb-2">
-                                <span className="text-sm text-muted-foreground">
-                                    {t("poweredBy")}{" "}
-                                    <Link
-                                        href="https://pangolin.net/"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="underline"
-                                    >
-                                        {env.branding.appName || "Pangolin"}
-                                    </Link>
-                                </span>
-                            </div>
-                        )
-                    ) : (
-                        <div className="text-center mb-2">
-                            <span className="text-sm text-muted-foreground">
-                                {t("poweredBy")}{" "}
-                                <Link
-                                    href="https://pangolin.net/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="underline"
-                                >
-                                    Pangolin
-                                </Link>
-                            </span>
-                        </div>
-                    )}
                     <Card>
                         <CardHeader>
                             {isUnlocked() &&

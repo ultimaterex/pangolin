@@ -2126,7 +2126,7 @@
     "orgAuthSignInTitle": "Accedi all'Organizzazione",
     "orgAuthChooseIdpDescription": "Scegli il tuo provider di identità per continuare",
     "orgAuthNoIdpConfigured": "Questa organizzazione non ha nessun provider di identità configurato. Puoi accedere con la tua identità Pangolin.",
-    "orgAuthSignInWithPangolin": "Accedi con Pangolino",
+    "orgAuthSignInWithPangolin": "Accedi con {appName}",
     "orgAuthSignInToOrg": "Accedi a un'organizzazione",
     "orgAuthSelectOrgTitle": "Accesso Organizzazione",
     "orgAuthSelectOrgDescription": "Inserisci l'ID dell'organizzazione per continuare",

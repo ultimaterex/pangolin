@@ -1,0 +1,72 @@
+# Opens (or updates) a PR that merges https://github.com/fosrl/pangolin main into your default branch.
+# Edit UPSTREAM_REPO / UPSTREAM_BRANCH if you track a different fork or branch.
+
+name: Upstream sync PR
+
+permissions:
+    contents: write
+    pull-requests: write
+
+on:
+    schedule:
+        # Weekly Monday 06:00 UTC — change or add cron as needed
+        - cron: "0 6 * * 1"
+    workflow_dispatch:
+
+concurrency:
+    group: upstream-sync
+    cancel-in-progress: false
+
+env:
+    UPSTREAM_REPO: fosrl/pangolin
+    UPSTREAM_BRANCH: main
+    SYNC_BRANCH: sync/upstream-fosrl
+
+jobs:
+    sync:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              with:
+                  fetch-depth: 0
+                  token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Configure git
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+            - name: Fetch upstream and merge into sync branch
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  set -euo pipefail
+                  DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
+                  git remote add upstream "https://github.com/${UPSTREAM_REPO}.git"
+                  git fetch upstream "${UPSTREAM_BRANCH}"
+
+                  git checkout "${DEFAULT_BRANCH}"
+                  git pull origin "${DEFAULT_BRANCH}" || true
+
+                  BEHIND=$(git rev-list --count HEAD.."upstream/${UPSTREAM_BRANCH}" || echo 0)
+                  if [ "${BEHIND}" -eq 0 ]; then
+                    echo "Already up to date with upstream/${UPSTREAM_BRANCH}; nothing to do."
+                    exit 0
+                  fi
+
+                  git checkout -B "${SYNC_BRANCH}" "${DEFAULT_BRANCH}"
+                  git merge "upstream/${UPSTREAM_BRANCH}" --no-edit -m "Merge upstream ${UPSTREAM_REPO} ${UPSTREAM_BRANCH}"
+
+                  git push origin "HEAD:refs/heads/${SYNC_BRANCH}" --force-with-lease
+
+                  EXISTING=$(gh pr list --head "${SYNC_BRANCH}" --state open --json number -q 'length')
+                  if [ "${EXISTING}" = "0" ]; then
+                    gh pr create \
+                      --base "${DEFAULT_BRANCH}" \
+                      --head "${SYNC_BRANCH}" \
+                      --title "chore: merge upstream ${UPSTREAM_REPO} (${UPSTREAM_BRANCH})" \
+                      --body "Automated merge of https://github.com/${UPSTREAM_REPO} (${UPSTREAM_BRANCH}) into ${DEFAULT_BRANCH}. Review for conflicts, then merge."
+                  else
+                    echo "Open PR already exists for ${SYNC_BRANCH}; branch updated."
+                  fi

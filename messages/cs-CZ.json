@@ -2126,7 +2126,7 @@
     "orgAuthSignInTitle": "Přihlášení do organizace",
     "orgAuthChooseIdpDescription": "Chcete-li pokračovat, vyberte svého poskytovatele identity",
     "orgAuthNoIdpConfigured": "Tato organizace nemá nakonfigurovány žádné poskytovatele identity. Místo toho se můžete přihlásit s vaší Pangolinovou identitou.",
-    "orgAuthSignInWithPangolin": "Přihlásit se pomocí Pangolinu",
+    "orgAuthSignInWithPangolin": "Přihlásit se pomocí {appName}",
     "orgAuthSignInToOrg": "Přihlásit se do organizace",
     "orgAuthSelectOrgTitle": "Přihlášení do organizace",
     "orgAuthSelectOrgDescription": "Zadejte ID vaší organizace pro pokračování",

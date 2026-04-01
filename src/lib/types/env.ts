@@ -61,10 +61,20 @@ export type Env = {
         };
         resourceAuthPage: {
             showLogo?: boolean;
-            hidePoweredBy?: boolean;
             titleText?: string;
             subtitleText?: string;
         };
         footer?: string;
+        /** Auth layout footer (copyright, edition, product link) */
+        authFooter?: {
+            /** Replaces default “Fossorial, Inc.” in © line */
+            publisher?: string;
+            /** Base URL for footer links (default: pangolin.net) */
+            siteUrl?: string;
+            /** Replaces Community / Enterprise / Cloud edition label; empty string hides it */
+            editionLabel?: string;
+            hidePublisher?: boolean;
+            hideEdition?: boolean;
+        };
     };
 };

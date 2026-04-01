@@ -149,11 +149,15 @@ export const privateConfigSchema = z.object({
             resource_auth_page: z
                 .object({
                     show_logo: z.boolean().optional(),
-                    hide_powered_by: z.boolean().optional(),
                     title_text: z.string().optional(),
                     subtitle_text: z.string().optional()
                 })
                 .optional(),
+            site_url: z.string().optional(),
+            auth_footer_publisher: z.string().optional(),
+            auth_footer_edition: z.string().optional(),
+            hide_auth_footer_publisher: z.boolean().optional(),
+            hide_auth_footer_edition: z.boolean().optional(),
             emails: z
                 .object({
                     signature: z.string().optional(),
