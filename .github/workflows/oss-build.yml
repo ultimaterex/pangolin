@@ -80,12 +80,20 @@ jobs:
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v3
 
+            - name: Read version from package.json
+              id: pkg
+              run: |
+                  VERSION=$(node -p "require('./package.json').version")
+                  echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+                  echo "Package version: $VERSION"
+
             - name: Docker metadata
               id: meta
               uses: docker/metadata-action@v5
               with:
                   images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
                   tags: |
+                      type=raw,value=${{ steps.pkg.outputs.version }}
                       type=sha,prefix=sha-
                       type=ref,event=branch
                       type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
@@ -112,7 +120,7 @@ jobs:
                   build-args: |
                       BUILD=oss
                       DATABASE=sqlite
-                      VERSION=${{ github.sha }}
+                      VERSION=${{ steps.pkg.outputs.version }}
                       REVISION=${{ github.sha }}
                       CREATED=${{ steps.timestamp.outputs.iso }}
                       IMAGE_TITLE=Pangolin

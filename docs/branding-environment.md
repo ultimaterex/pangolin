@@ -114,7 +114,7 @@ The workflow `.github/workflows/oss-build.yml` runs on pushes and pull requests 
 | Output | What it does |
 |--------|----------------|
 | **Artifacts** | Uploads `dist/` and `.next/` (cache stripped) as `pangolin-oss-<sha>`. |
-| **GHCR** | Builds the repo `Dockerfile` with `BUILD=oss` and `DATABASE=sqlite`, then **pushes** to **`ghcr.io/<owner>/<repo>`** on branch pushes, `workflow_dispatch`, and **same-repo** pull requests (fork PRs build only; no push). Tags include `sha-…`, the branch name, and `latest` for `main` (not on PRs). Uses `docker/*-action@v3` / `@v5` semver tags. |
+| **GHCR** | Builds the repo `Dockerfile` with `BUILD=oss` and `DATABASE=sqlite`, then **pushes** to **`ghcr.io/<owner>/<repo>`** on branch pushes, `workflow_dispatch`, and **same-repo** pull requests (fork PRs build only; no push). Image tags include **`version` from `package.json`**, `sha-…`, branch name, and `latest` on `main` (not on PRs). The Dockerfile `VERSION` build-arg is set to that package version; `REVISION` stays the git SHA. Uses `docker/*-action@v3` / `@v5`. |
 
 After the first push, open the package in **GitHub → Packages** and set visibility if you want it public. Pulling an image:
 
