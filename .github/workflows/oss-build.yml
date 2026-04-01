@@ -64,43 +64,49 @@ jobs:
                   retention-days: 30
 
     # Pushes to ghcr.io/<owner>/<repo> — same Dockerfile as local `make dev-build-sqlite`.
-    # Pull requests: build only (no push). Pushes to main/dev + workflow_dispatch: build and push.
+    # Fork PRs: build only (no push). Same-repo PRs + pushes + workflow_dispatch: build and push.
     docker-oss:
         runs-on: ubuntu-latest
+        env:
+            REGISTRY: ghcr.io
+            # Preserves case; docker/metadata-action lowercases image refs for tags
+            IMAGE_NAME: ${{ github.repository }}
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
             - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+              uses: docker/setup-buildx-action@v3
 
             - name: Docker metadata
               id: meta
-              uses: docker/metadata-action@318602eec993e4e6cc7e7205e781e2d4760e893c # v5.9.0
+              uses: docker/metadata-action@v5
               with:
-                  images: ghcr.io/${{ github.repository }}
+                  images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
                   tags: |
                       type=sha,prefix=sha-
                       type=ref,event=branch
-                      type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+                      type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
 
             - name: Set OCI created timestamp
               id: timestamp
               run: echo "iso=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
 
             - name: Log in to GitHub Container Registry
-              if: github.event_name != 'pull_request'
-              uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c58d # v3.6.0
+              if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+              uses: docker/login-action@v3
               with:
-                  registry: ghcr.io
+                  registry: ${{ env.REGISTRY }}
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Build and push image
-              uses: docker/build-push-action@1dc73863535b631f894b8d905b7a216e6cb7655e # v6.18.0
+              uses: docker/build-push-action@v5
               with:
                   context: .
-                  push: ${{ github.event_name != 'pull_request' }}
+                  push: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
                   tags: ${{ steps.meta.outputs.tags }}
                   labels: ${{ steps.meta.outputs.labels }}
                   build-args: |
