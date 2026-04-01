@@ -2126,7 +2126,7 @@
     "orgAuthSignInTitle": "Kuruluş Giriş",
     "orgAuthChooseIdpDescription": "Devam etmek için kimlik sağlayıcınızı seçin",
     "orgAuthNoIdpConfigured": "Bu kuruluşta yapılandırılmış kimlik sağlayıcı yok. Bunun yerine Pangolin kimliğinizle giriş yapabilirsiniz.",
-    "orgAuthSignInWithPangolin": "Pangolin ile Giriş Yap",
+    "orgAuthSignInWithPangolin": "{appName} ile Giriş Yap",
     "orgAuthSignInToOrg": "Bir kuruluşa giriş yapın",
     "orgAuthSelectOrgTitle": "Kuruluş Giriş",
     "orgAuthSelectOrgDescription": "Devam etmek için kuruluş kimliğinizi girin",

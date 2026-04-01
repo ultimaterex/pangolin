@@ -2126,7 +2126,7 @@
     "orgAuthSignInTitle": "Organisasjonsinnlogging",
     "orgAuthChooseIdpDescription": "Velg din identitet leverandør for å fortsette",
     "orgAuthNoIdpConfigured": "Denne organisasjonen har ikke noen identitetstjeneste konfigurert. Du kan i stedet logge inn med Pangolin identiteten din.",
-    "orgAuthSignInWithPangolin": "Logg inn med Pangolin",
+    "orgAuthSignInWithPangolin": "Logg inn med {appName}",
     "orgAuthSignInToOrg": "Logg inn på en organisasjon",
     "orgAuthSelectOrgTitle": "Organisasjonsinnlogging",
     "orgAuthSelectOrgDescription": "Skriv inn organisasjons-ID-en din for å fortsette",

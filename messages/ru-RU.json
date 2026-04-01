@@ -2126,7 +2126,7 @@
     "orgAuthSignInTitle": "Вход в организацию",
     "orgAuthChooseIdpDescription": "Выберите своего поставщика удостоверений личности для продолжения",
     "orgAuthNoIdpConfigured": "Эта организация не имеет настроенных поставщиков идентификационных данных. Вместо этого вы можете войти в свой Pangolin.",
-    "orgAuthSignInWithPangolin": "Войти через Pangolin",
+    "orgAuthSignInWithPangolin": "Войти через {appName}",
     "orgAuthSignInToOrg": "Войти в организацию",
     "orgAuthSelectOrgTitle": "Вход в организацию",
     "orgAuthSelectOrgDescription": "Введите ID вашей организации, чтобы продолжить",

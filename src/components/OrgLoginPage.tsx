@@ -50,21 +50,9 @@ export default async function OrgLoginPage({
 }: OrgLoginPageProps) {
     const env = pullEnv();
     const t = await getTranslations();
+    const appName = env.branding.appName || "Pangolin";
     return (
         <div>
-            <div className="text-center mb-2">
-                <span className="text-sm text-muted-foreground">
-                    {t("poweredBy")}{" "}
-                    <Link
-                        href="https://pangolin.net/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline"
-                    >
-                        {env.branding.appName || "Pangolin"}
-                    </Link>
-                </span>
-            </div>
             <Card className="w-full max-w-md">
                 <CardHeader>
                     {branding?.logoUrl && (
@@ -109,7 +97,9 @@ export default async function OrgLoginPage({
                                 href={`${env.app.dashboardUrl}/auth/login${buildQueryString(searchParams)}`}
                             >
                                 <Button className="w-full">
-                                    {t("orgAuthSignInWithPangolin")}
+                                    {t("orgAuthSignInWithPangolin", {
+                                        appName
+                                    })}
                                 </Button>
                             </Link>
                         </div>

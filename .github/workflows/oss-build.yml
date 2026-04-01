@@ -1,0 +1,63 @@
+# Community (OSS) build — single ubuntu job, uploads dist + .next as a GitHub Actions artifact.
+
+name: OSS build
+
+permissions:
+    contents: read
+
+on:
+    push:
+        branches:
+            - main
+            - dev
+    pull_request:
+        branches:
+            - main
+            - dev
+    workflow_dispatch:
+
+concurrency:
+    group: oss-build-${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    build-oss:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+            - name: Install Node
+              uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+              with:
+                  node-version: "24"
+                  cache: npm
+
+            - name: Copy example config
+              run: cp config/config.example.yml config/config.yml
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: SQLite + OSS build targets
+              run: |
+                  npm run set:sqlite
+                  npm run set:oss
+
+            - name: Generate DB client (drizzle)
+              run: npm run db:generate
+
+            - name: Build (Next + server bundles)
+              run: npm run build
+
+            - name: Remove Next cache from artifact
+              run: rm -rf .next/cache
+
+            - name: Upload OSS build artifact
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              with:
+                  name: pangolin-oss-${{ github.sha }}
+                  path: |
+                      dist/
+                      .next/
+                  retention-days: 30

@@ -112,15 +112,25 @@ export function pullEnv(): Env {
                     process.env.RESOURCE_AUTH_PAGE_SHOW_LOGO === "true"
                         ? true
                         : false,
-                hidePoweredBy:
-                    process.env.RESOURCE_AUTH_PAGE_HIDE_POWERED_BY === "true"
-                        ? true
-                        : false,
                 titleText: process.env.RESOURCE_AUTH_PAGE_TITLE_TEXT as string,
                 subtitleText: process.env
                     .RESOURCE_AUTH_PAGE_SUBTITLE_TEXT as string
             },
-            footer: process.env.BRANDING_FOOTER as string
+            footer: process.env.BRANDING_FOOTER as string,
+            authFooter: {
+                publisher: process.env.BRANDING_AUTH_FOOTER_PUBLISHER as
+                    | string
+                    | undefined,
+                siteUrl: process.env.BRANDING_SITE_URL as string | undefined,
+                editionLabel:
+                    process.env.BRANDING_AUTH_FOOTER_EDITION !== undefined
+                        ? (process.env.BRANDING_AUTH_FOOTER_EDITION as string)
+                        : undefined,
+                hidePublisher:
+                    process.env.BRANDING_AUTH_FOOTER_HIDE_PUBLISHER === "true",
+                hideEdition:
+                    process.env.BRANDING_AUTH_FOOTER_HIDE_EDITION === "true"
+            }
         }
     };
 }

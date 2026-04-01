@@ -10,7 +10,7 @@ import { getTranslations } from "next-intl/server";
 import { cache } from "react";
 
 export const metadata: Metadata = {
-    title: `Auth - ${process.env.BRANDING_APP_NAME || "Pangolin"}`,
+    title: `Auth - ${process.env.BRANDING_APP_NAME ?? "Pangolin"}`,
     description: ""
 };
 
@@ -21,6 +21,29 @@ type AuthLayoutProps = {
 export default async function AuthLayout({ children }: AuthLayoutProps) {
     const env = pullEnv();
     const t = await getTranslations();
+    const siteUrl = env.branding.authFooter?.siteUrl ?? "https://pangolin.net";
+    const appName = env.branding.appName || "Pangolin";
+    const publisher =
+        env.branding.authFooter?.publisher ?? "Fossorial, Inc.";
+    const showPublisher = !env.branding.authFooter?.hidePublisher;
+
+    function editionLabel(): string | null {
+        if (env.branding.authFooter?.hideEdition) {
+            return null;
+        }
+        const override = env.branding.authFooter?.editionLabel;
+        if (override !== undefined) {
+            return override.length > 0 ? override : null;
+        }
+        if (build === "oss") {
+            return t("communityEdition");
+        }
+        if (build === "enterprise") {
+            return t("enterpriseEdition");
+        }
+        return t("pangolinCloud");
+    }
+
     let hideFooter = false;
 
     let licenseStatus: GetLicenseStatusResponse | null = null;
@@ -42,6 +65,9 @@ export default async function AuthLayout({ children }: AuthLayoutProps) {
         }
     }
 
+    const editionText = editionLabel();
+    const year = new Date().getFullYear();
+
     return (
         <div className="h-full flex flex-col">
             <div className="hidden md:flex justify-end items-center p-3 space-x-2">
@@ -55,37 +81,37 @@ export default async function AuthLayout({ children }: AuthLayoutProps) {
             {!hideFooter && (
                 <footer className="hidden md:block w-full mt-12 py-3 mb-6 px-4">
                     <div className="container mx-auto flex flex-wrap justify-center items-center h-3 space-x-4 text-xs text-neutral-400 dark:text-neutral-600">
+                        {showPublisher && (
+                            <>
+                                <a
+                                    href={siteUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label={publisher}
+                                    className="flex items-center space-x-2 whitespace-nowrap"
+                                >
+                                    <span>
+                                        © {year} {publisher}
+                                    </span>
+                                </a>
+                                <Separator orientation="vertical" />
+                            </>
+                        )}
                         <a
-                            href="https://pangolin.net"
+                            href={siteUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            aria-label="Built by Fossorial"
+                            aria-label={appName}
                             className="flex items-center space-x-2 whitespace-nowrap"
                         >
-                            <span>
-                                © {new Date().getFullYear()} Fossorial, Inc.
-                            </span>
+                            <span>{appName}</span>
                         </a>
-                        <Separator orientation="vertical" />
-                        <a
-                            href="https://pangolin.net"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Built by Fossorial"
-                            className="flex items-center space-x-2 whitespace-nowrap"
-                        >
-                            <span>
-                                {process.env.BRANDING_APP_NAME || "Pangolin"}
-                            </span>
-                        </a>
-                        <Separator orientation="vertical" />
-                        <span>
-                            {build === "oss"
-                                ? t("communityEdition")
-                                : build === "enterprise"
-                                  ? t("enterpriseEdition")
-                                  : t("pangolinCloud")}
-                        </span>
+                        {editionText !== null && (
+                            <>
+                                <Separator orientation="vertical" />
+                                <span>{editionText}</span>
+                            </>
+                        )}
                         {build === "enterprise" &&
                         licenseStatus?.isHostLicensed &&
                         licenseStatus?.isLicenseValid &&
